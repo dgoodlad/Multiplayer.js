@@ -14,5 +14,7 @@
     "socket.io": "~0.8.7",
     "coffee-script": "~1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vows": "~0.6.0"
+  }
 }
