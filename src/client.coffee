@@ -8,22 +8,30 @@ class Client
       @oldSnap = @nextSnap
       @nextSnap = null
     if time == @oldSnap.time
-      @oldSnap.players
+      entities = @oldSnap.players
     else if @oldSnap? and @nextSnap?
-      entities = {}
-      interp = (time - @oldSnap.time) / (@nextSnap.time - @oldSnap.time)
-      for name, player of @oldSnap.players
-        p0 = player.position
-        p1 = @nextSnap.players[name].position
-        entities[name] =
-          position:
-            x: (p0.x + p1.x) * interp
-            y: (p0.y + p1.y) * interp
-      entities
+      entities = @interpolate @oldSnap, @nextSnap, time
     else
+      entities = @extrapolate @oldSnap, time
+
+    entities
+
+  interpolate: (snap0, snap1, time) ->
+    entities = {}
+    interp = (time - snap0.time) / (snap1.time - snap0.time)
+    for name, player of snap0.players
+      p0 = player.position
+      p1 = snap1.players[name].position
+      entities[name] =
+        position:
+          x: (p0.x + p1.x) * interp
+          y: (p0.y + p1.y) * interp
+    entities
+
+  extrapolate: (snap, time) ->
       entities = {}
-      extrap = time - @oldSnap.time
-      for name, player of @oldSnap.players
+      extrap = time - snap.time
+      for name, player of snap.players
         p = player.position
         v = player.velocity
         entities[name] = 
