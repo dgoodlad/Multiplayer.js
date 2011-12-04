@@ -3,7 +3,7 @@ class Client
     @oldSnap = @nextSnap
     @nextSnap = snapshot
 
-  renderFrame: (time) ->
+  renderFrame: (time, input = {}) ->
     if time >= @nextSnap.time
       @oldSnap = @nextSnap
       @nextSnap = null
@@ -14,6 +14,7 @@ class Client
     else
       entities = @extrapolate @oldSnap, time
 
+    @userCommand = time: time, input: input
     entities
 
   interpolate: (snap0, snap1, time) ->

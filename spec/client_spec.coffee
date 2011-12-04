@@ -55,3 +55,14 @@ describe "Client", ->
       entities = client.renderFrame(2.5)
       expect(entities['test'].position).toEqual { x: 1.5, y: 3 }
 
+  describe "input handling", ->
+    beforeEach ->
+      client.receiveSnapshot { time: 1, players: {} }
+      client.receiveSnapshot { time: 2, players: {} }
+
+    it "should grab the user's input as a user command", ->
+      client.renderFrame 1.5, { forward: true }
+      expect(client.userCommand.time).toEqual 1.5
+      expect(client.userCommand.input).toEqual { forward: true }
+
+
