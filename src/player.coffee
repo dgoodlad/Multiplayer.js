@@ -3,33 +3,53 @@ rotate = (v, theta) ->
   y = v.y * Math.cos(theta) + v.x * Math.sin(theta)
   { x: x, y: y }
 
+magnitude = (v) ->
+  Math.sqrt(v.x * v.x + v.y * v.y, 0.5)
+
+cap = (v, max) ->
+  mag = magnitude(v)
+  if mag < max
+    v
+  else
+    x: v.x / mag * max
+    y: v.y / mag * max
+
 class Player
+  @maxSpeed = 10
+
   constructor: (initialState) ->
     @position = initialState.position
     @velocity = { x: 0, y: 0 }
-    @acceleration = { x: 0, y: 0 }
 
     # Unit vector pointint in the direction the player is facing
     @directionVector = { x: 1.0, y: 0 }
-    @angularVelocity = 0 # Radians / time
 
   updatePhysics: (dt, inputs) ->
-    if inputs.forward
-      @acceleration.x = @directionVector.x
-      @acceleration.y = @directionVector.y
-
     if inputs.right
-      @angularVelocity = Math.PI / -2
-    else if inputs.left
-      @angularVelocity = Math.PI / 2
+      @velocity = rotate @velocity, Math.PI / -2 * dt
+      @directionVector = rotate @directionVector, Math.PI / -2 * dt
+    if inputs.left
+      @velocity = rotate @velocity, Math.PI / 2 * dt
+      @directionVector = rotate @directionVector, Math.PI / 2 * dt
 
-    if @angularVelocity != 0
-      @directionVector = rotate(@directionVector, @angularVelocity * dt)
+    speed = @speed()
+    if inputs.forward
+      acceleration =
+        x: @directionVector.x * 1.0
+        y: @directionVector.y * 1.0
+    else
+      acceleration =
+        x: @directionVector.x * speed * -1 / dt
+        y: @directionVector.y * speed * -1 / dt
 
-    @position.x = @velocity.x * dt + 0.5 * @acceleration.x * @acceleration.x
-    @position.y = @velocity.y * dt + 0.5 * @acceleration.y * @acceleration.y
-    @velocity.x = @velocity.x + @acceleration.x * dt
-    @velocity.y = @velocity.y + @acceleration.y * dt
+    @position.x += @velocity.x * dt + 0.5 * acceleration.x * dt * dt
+    @position.y += @velocity.y * dt + 0.5 * acceleration.y * dt * dt
+    @velocity.x += acceleration.x * dt
+    @velocity.y += acceleration.y * dt
+    @velocity = cap @velocity, Player.maxSpeed
     this
+
+  speed: ->
+    magnitude @velocity
 
 module.exports = Player
