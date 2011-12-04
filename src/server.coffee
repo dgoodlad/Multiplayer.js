@@ -11,25 +11,36 @@ class Server
     player.time = @time
 
   run: (callback) ->
-    frame = 0
     frameLength = 1000 / @fps
     gameLoop = =>
       t1 = new Date().milliseconds
-      frame += 1
-      state = @update frameLength
-      callback frame, state
+      @time += 1
+      # TODO update non-player entities
+      callback @snapshot()
       t2 = new Date().milliseconds
-      setTimeout gameLoop, frameLength - (t2 - t1)
+      @timeout = setTimeout gameLoop, frameLength - (t2 - t1)
     gameLoop()
 
-  update: (dt) ->
-    @world.update dt
-    @world.getState()
+  stop: ->
+    clearTimeout @timeout if @timeout?
 
   input: (name, command) ->
     return if command.time < @players[name].time
     dt = command.time - @players[name].time
     @players[name].updatePhysics dt, command.inputs
     @players[name].time = command.time
+
+  snapshot: ->
+    snapshot =
+      time: @time
+      players: {}
+    for name, player of @players
+      snapshot.players[name] = @playerSnapshot(player)
+    snapshot
+
+  playerSnapshot: (player) ->
+    time: player.time
+    position: player.position
+    velocity: player.velocity
 
 module.exports = Server

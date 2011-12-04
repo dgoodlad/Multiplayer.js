@@ -5,7 +5,10 @@ describe "Server", ->
 
   beforeEach ->
     server = new Server
-    player = updatePhysics: ->
+    player =
+      position: { x: 0, y: 0 }
+      velocity: { x: 0, y: 0 }
+      updatePhysics: ->
     server.addPlayer 'test', player
     spyOn player, 'updatePhysics'
 
@@ -28,3 +31,13 @@ describe "Server", ->
     expect(player.updatePhysics).toHaveBeenCalledWith 1.0, { forward: true }
     expect(player.updatePhysics).toHaveBeenCalledWith 0.5, { left: true }
     expect(player.updatePhysics.callCount).toEqual 2
+
+  it "should generate a snapshot of the world", ->
+    snapshot = server.snapshot()
+    expect(snapshot).toEqual
+      time: 0
+      players:
+        'test':
+          time: 0
+          position: { x: 0, y: 0 }
+          velocity: { x: 0, y: 0 }
