@@ -97,10 +97,5 @@ describe "Client", ->
       client.renderFrame 1.5, { forward: true }
       client.renderFrame 2.0, { right: true }
       client.receiveSnapshot { time: 3, players: { 'john': time: 1.5, position: { x: 0.25, y: 0 } } }
-
-      client.localPlayer.calculatePhysics.reset()
-      client.renderFrame 2.5, {}
-      expect(client.localPlayer.calculatePhysics.callCount).toEqual 1
-      expect(client.localPlayer.calculatePhysics.argsForCall[0][0]).toNearlyEqual 0.5
-      expect(client.localPlayer.calculatePhysics.argsForCall[0][1]).toEqual { right: true }
+      expect(client.userCommands).toEqual [ { time: 2.0, input: { right: true } } ]
 

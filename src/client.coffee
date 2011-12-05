@@ -10,6 +10,12 @@ class Client
       @nextSnap = snapshot
     else
       @oldSnap = snapshot
+    @expireUserCommands(snapshot)
+
+  expireUserCommands: (latestSnap) ->
+    if latestSnap.players[@localPlayer.name]
+      lastAckTime = latestSnap.players[@localPlayer.name].time
+      @userCommands = @userCommands.filter (command) -> command.time > lastAckTime
 
   renderFrame: (time, input = {}) ->
     if time >= @nextSnap.time
