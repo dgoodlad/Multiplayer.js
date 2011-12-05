@@ -21,8 +21,6 @@ describe "Client", ->
       client.renderFrame(2)
       expect(client.oldSnap.time).toEqual 2
 
-    xit "should run client-side prediction", ->
-
   describe "entity interpolation", ->
     beforeEach ->
       client.receiveSnapshot time: 1.0, players:
