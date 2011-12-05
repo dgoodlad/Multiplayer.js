@@ -1,10 +1,19 @@
 Client = require '../src/client'
 
+beforeEach ->
+  this.addMatchers
+    toNearlyEqual: (expected, precision = 5) ->
+      multiplier = Math.pow 10, precision
+      actual = Math.round this.actual * multiplier
+      expected = Math.round expected * multiplier
+      actual == expected
+
 describe "Client", ->
   client = null
 
   beforeEach ->
     client = new Client
+    client.localPlayer = jasmine.createSpyObj 'Player', ['calculatePhysics']
 
   it "should maintain a pair of the two most recent snapshots", ->
     client.receiveSnapshot { time: 1, players: {} }
@@ -60,7 +69,38 @@ describe "Client", ->
 
     it "should grab the user's input as a user command", ->
       client.renderFrame 1.5, { forward: true }
-      expect(client.userCommand.time).toEqual 1.5
-      expect(client.userCommand.input).toEqual { forward: true }
+      expect(client.userCommands[0].time).toEqual 1.5
+      expect(client.userCommands[0].input).toEqual { forward: true }
 
+  describe "client-side prediction", ->
+    beforeEach ->
+      client.localPlayer.name = 'john'
+      client.receiveSnapshot { time: 1, players: { 'john': time: 1, position: { x: 0, y: 0 } } }
+      client.receiveSnapshot { time: 2, players: { 'john': time: 1, position: { x: 0, y: 0 } } }
+
+    it "should replay a single un-acknowledged user command", ->
+      client.renderFrame 1.25, { forward: true }
+      client.renderFrame 1.5, {}
+      expect(client.localPlayer.calculatePhysics.callCount).toEqual 1
+      expect(client.localPlayer.calculatePhysics).toHaveBeenCalledWith 0.25, { forward: true }
+
+    it "should replay multiple user commands", ->
+      client.renderFrame 1.25, { forward: true }
+      client.renderFrame 1.5, { right: true }
+      client.renderFrame 1.75, { left: true }
+      expect(client.localPlayer.calculatePhysics.callCount).toEqual 3
+      expect(client.localPlayer.calculatePhysics.argsForCall[0]).toEqual [ 0.25, { forward: true } ]
+      expect(client.localPlayer.calculatePhysics.argsForCall[1]).toEqual [ 0.25, { forward: true } ]
+      expect(client.localPlayer.calculatePhysics.argsForCall[2]).toEqual [ 0.25, { right: true } ]
+
+    it "should discard acknowledged user commands", ->
+      client.renderFrame 1.5, { forward: true }
+      client.renderFrame 2.0, { right: true }
+      client.receiveSnapshot { time: 3, players: { 'john': time: 1.5, position: { x: 0.25, y: 0 } } }
+
+      client.localPlayer.calculatePhysics.reset()
+      client.renderFrame 2.5, {}
+      expect(client.localPlayer.calculatePhysics.callCount).toEqual 1
+      expect(client.localPlayer.calculatePhysics.argsForCall[0][0]).toNearlyEqual 0.5
+      expect(client.localPlayer.calculatePhysics.argsForCall[0][1]).toEqual { right: true }
 

@@ -1,7 +1,15 @@
 class Client
+  constructor: ->
+    @userCommands = []
+
   receiveSnapshot: (snapshot) ->
-    @oldSnap = @nextSnap
-    @nextSnap = snapshot
+    if @oldSnap? and @nextSnap?
+      @oldSnap = @nextSnap
+      @nextSnap = snapshot
+    else if @oldSnap?
+      @nextSnap = snapshot
+    else
+      @oldSnap = snapshot
 
   renderFrame: (time, input = {}) ->
     if time >= @nextSnap.time
@@ -14,7 +22,8 @@ class Client
     else
       entities = @extrapolate @oldSnap, time
 
-    @userCommand = time: time, input: input
+    @predict(@nextSnap or @oldSnap, @userCommands) if @userCommands.length > 0
+    @userCommands.push time: time, input: input
     entities
 
   interpolate: (snap0, snap1, time) ->
@@ -41,5 +50,12 @@ class Client
             y: p.y + v.y * extrap
       entities
 
+  predict: (snap, commands) ->
+    if snap.players[@localPlayer.name]
+      t = lastAckTime = snap.players[@localPlayer.name].time
+      for command in commands
+        if command.time > lastAckTime
+          @localPlayer.calculatePhysics(command.time - t, command.input)
+          t = command.time
 
 module.exports = Client
