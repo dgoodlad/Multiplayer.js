@@ -10,10 +10,12 @@ beforeEach ->
 
 describe "Client", ->
   client = null
+  player = null
 
   beforeEach ->
     client = new Client
-    client.localPlayer = jasmine.createSpyObj 'Player', ['calculatePhysics']
+    player = client.localPlayer =
+      jasmine.createSpyObj 'Player', ['calculatePhysics']
 
   it "should maintain a pair of the two most recent snapshots", ->
     client.receiveSnapshot { time: 1, players: {} }
@@ -81,17 +83,17 @@ describe "Client", ->
     it "should replay a single un-acknowledged user command", ->
       client.renderFrame 1.25, { forward: true }
       client.renderFrame 1.5, {}
-      expect(client.localPlayer.calculatePhysics.callCount).toEqual 1
-      expect(client.localPlayer.calculatePhysics).toHaveBeenCalledWith 0.25, { forward: true }
+      expect(player.calculatePhysics.callCount).toEqual 1
+      expect(player.calculatePhysics).toHaveBeenCalledWith 0.25, { forward: true }
 
     it "should replay multiple user commands", ->
       client.renderFrame 1.25, { forward: true }
       client.renderFrame 1.5, { right: true }
       client.renderFrame 1.75, { left: true }
-      expect(client.localPlayer.calculatePhysics.callCount).toEqual 3
-      expect(client.localPlayer.calculatePhysics.argsForCall[0]).toEqual [ 0.25, { forward: true } ]
-      expect(client.localPlayer.calculatePhysics.argsForCall[1]).toEqual [ 0.25, { forward: true } ]
-      expect(client.localPlayer.calculatePhysics.argsForCall[2]).toEqual [ 0.25, { right: true } ]
+      expect(player.calculatePhysics.callCount).toEqual 3
+      expect(player.calculatePhysics.argsForCall[0]).toEqual [ 0.25, { forward: true } ]
+      expect(player.calculatePhysics.argsForCall[1]).toEqual [ 0.25, { forward: true } ]
+      expect(player.calculatePhysics.argsForCall[2]).toEqual [ 0.25, { right: true } ]
 
     it "should discard acknowledged user commands", ->
       client.renderFrame 1.5, { forward: true }
