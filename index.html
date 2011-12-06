@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="charset" value="utf-8">
+
+    <script src="/coffee-script.js"></script>
+    <script src="/client.js"></script>
+    <script src="/server.js"></script>
+    <script src="/player.js"></script>
+
+    <style type="text/css">
+      .scene {
+        width: 300px;
+        height: 300px;
+        border: 1px solid silver;
+        margin: 10px;
+        position: relative;
+        float: left;
+      }
+
+      .player {
+        position: absolute;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="john-scene" class="scene">
+      <h1>John's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <div id="jane-scene" class="scene">
+      <h1>Jane's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <div id="server-scene" class="scene">
+      <h1>Server's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/coffeescript">
+      renderPlayer = (player, element) ->
+        element.style['left'] = "#{player.position.x}px"
+        element.style['top'] = "#{player.position.y}px"
+
+      renderServer = (snapshot) ->
+        for name, player of snapshot.players
+          el = document.querySelector("#server-scene .player[data-player=#{name}]")
+          renderPlayer player, el
+
+      renderClient = (clientName, entities) ->
+        for name, player of entities
+          el = document.querySelector("##{clientName}-scene .player[data-player=#{name}]")
+          renderPlayer player, el
+
+      class FakeConnection
+        constructor: (@latency) ->
+
+        transmit: (data, receiver, method, args...) ->
+          json = JSON.stringify data
+          parsed = JSON.parse json
+          args = JSON.parse(JSON.stringify(args))
+          args.push parsed
+          setTimeout (-> receiver[method].apply(receiver, args)), @latency
+
+      connection = new FakeConnection(200)
+
+      server = new Server()
+      server.fps = 20
+      server.addPlayer 'john', new Player(position: { x: 0, y: 0 })
+      server.addPlayer 'jane', new Player(position: { x: 100, y: 0 })
+
+      john = new Player(position: { x: 0, y: 0 })
+      john.name = 'john'
+      john.calculatePhysics = john.updatePhysics
+      jane = new Player(position: { x: 100, y: 0 })
+      jane.name = 'jane'
+      jane.calculatePhysics = jane.updatePhysics
+
+      johnClient = new Client(server.fps)
+      johnClient.localPlayer = john
+      janeClient = new Client(server.fps)
+      janeClient.localPlayer = jane
+
+      johnClient.readInput = -> { forward: true}
+      janeClient.readInput = -> { forward: true}
+
+      server.run (snapshot) ->
+        connection.transmit snapshot, johnClient, 'receiveSnapshot'
+        connection.transmit snapshot, janeClient, 'receiveSnapshot'
+        renderServer(snapshot)
+
+      startClients = ->
+        johnClient.run 30, (entities, command) ->
+          johnClient.lastRenderedEntites = entities
+          connection.transmit command, server, 'input', 'john'
+          renderClient 'john', entities
+        janeClient.run 30, (entities, command) ->
+          janeClient.lastRenderedEntites = entities
+          connection.transmit command, server, 'input', 'jane'
+          renderClient 'jane', entities
+
+      setTimeout startClients, 1000
+    </script>
+  </body>
+</html>
