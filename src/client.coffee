@@ -1,6 +1,21 @@
 class Client
-  constructor: ->
+  constructor: (@serverFps) ->
     @userCommands = []
+
+  run: (fps, callback) ->
+    frameLength = 1000 / fps
+    serverFrameLength = 1000 / @serverFps
+    time = @oldFrame?.time or 0
+
+    gameLoop = =>
+      t1 = new Date().getTime()
+      time += @serverFps / fps
+      entities = @renderFrame time, @readInput()
+      command = @userCommands[@userCommands.length - 1]
+      callback entities, command
+      t2 = new Date().getTime()
+      @timeout = setTimeout gameLoop, frameLength - (t2 - t1)
+    gameLoop()
 
   receiveSnapshot: (snapshot) ->
     if @oldSnap? and @nextSnap?
@@ -29,7 +44,8 @@ class Client
       entities = @extrapolate @oldSnap, time
 
     @predict(@nextSnap or @oldSnap, @userCommands) if @userCommands.length > 0
-    @userCommands.push time: time, input: input
+    entities[@localPlayer.name].position = @localPlayer.position
+    @userCommands.push time: time, inputs: input
     entities
 
   interpolate: (snap0, snap1, time) ->
@@ -40,8 +56,8 @@ class Client
       p1 = snap1.players[name].position
       entities[name] =
         position:
-          x: (p0.x + p1.x) * interp
-          y: (p0.y + p1.y) * interp
+          x: p0.x + (p1.x - p0.x) * interp
+          y: p0.y + (p1.y - p0.y) * interp
     entities
 
   extrapolate: (snap, time) ->
@@ -58,10 +74,19 @@ class Client
 
   predict: (snap, commands) ->
     if snap.players[@localPlayer.name]
+      @localPlayer.position = snap.players[@localPlayer.name].position
+      @localPlayer.velocity = snap.players[@localPlayer.name].velocity
       t = lastAckTime = snap.players[@localPlayer.name].time
       for command in commands
         if command.time > lastAckTime
-          @localPlayer.calculatePhysics(command.time - t, command.input)
+          dt = @frameTimeInSeconds(command.time - t)
+          @localPlayer.calculatePhysics(dt, command.inputs)
           t = command.time
 
-module.exports = Client
+  frameTimeInSeconds: (time) ->
+    time / @serverFps
+
+if module?
+  module.exports = Client
+else
+  window.Client = Client

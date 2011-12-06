@@ -52,4 +52,7 @@ class Player
   speed: ->
     magnitude @velocity
 
-module.exports = Player
+if module?
+  module.exports = Player
+else
+  window.Player = Player

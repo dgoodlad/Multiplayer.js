@@ -13,11 +13,11 @@ class Server
   run: (callback) ->
     frameLength = 1000 / @fps
     gameLoop = =>
-      t1 = new Date().milliseconds
+      t1 = new Date().getTime()
       @time += 1
       # TODO update non-player entities
       callback @snapshot()
-      t2 = new Date().milliseconds
+      t2 = new Date().getTime()
       @timeout = setTimeout gameLoop, frameLength - (t2 - t1)
     gameLoop()
 
@@ -26,9 +26,12 @@ class Server
 
   input: (name, command) ->
     return if command.time < @players[name].time
-    dt = command.time - @players[name].time
+    dt = @frameTimeInSeconds(command.time - @players[name].time)
     @players[name].updatePhysics dt, command.inputs
     @players[name].time = command.time
+
+  frameTimeInSeconds: (time) ->
+    time / @fps
 
   snapshot: ->
     snapshot =
@@ -43,4 +46,7 @@ class Server
     position: player.position
     velocity: player.velocity
 
-module.exports = Server
+if module?
+  module.exports = Server
+else
+  window.Server = Server
