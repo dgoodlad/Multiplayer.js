@@ -27,7 +27,7 @@ class Server
   input: (name, command) ->
     return if command.time < @players[name].time
     dt = @frameTimeInSeconds(command.time - @players[name].time)
-    @players[name].updatePhysics dt, command.inputs
+    @players[name].updatePhysics dt, command.inputs if dt < 1
     @players[name].time = command.time
 
   frameTimeInSeconds: (time) ->
