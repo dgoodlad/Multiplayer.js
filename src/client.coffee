@@ -5,11 +5,12 @@ class Client
   run: (fps, callback) ->
     frameLength = 1000 / fps
     serverFrameLength = 1000 / @serverFps
-    time = @oldFrame?.time or 0
+    time = @oldSnap?.time or 0
 
     gameLoop = =>
       t1 = new Date().getTime()
       time += @serverFps / fps
+      time = @oldSnap.time if @oldSnap? and @oldSnap.time > time
       entities = @renderFrame time, @readInput()
       command = @userCommands[@userCommands.length - 1]
       callback entities, command
