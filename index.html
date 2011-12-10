@@ -82,7 +82,7 @@
           args.push parsed
           setTimeout (-> receiver[method].apply(receiver, args)), @latency
 
-      connection = new FakeConnection(200)
+      connection = new FakeConnection(400)
 
       server = new Server()
       server.fps = 20
@@ -101,8 +101,8 @@
       janeClient = new Client(server.fps)
       janeClient.localPlayer = jane
 
-      johnClient.readInput = -> { forward: true}
-      janeClient.readInput = -> { forward: true}
+      johnClient.readInput = -> { forward: true, right: Math.random() > 0.9, left: Math.random() < 0.1 }
+      janeClient.readInput = -> { forward: true, right: Math.random() > 0.95, left: Math.random() < 0.2 }
 
       server.run (snapshot) ->
         connection.transmit snapshot, johnClient, 'receiveSnapshot'
