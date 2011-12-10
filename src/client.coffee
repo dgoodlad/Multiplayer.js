@@ -62,16 +62,16 @@ class Client
     entities
 
   extrapolate: (snap, time) ->
-      entities = {}
-      extrap = time - snap.time
-      for name, player of snap.players
-        p = player.position
-        v = player.velocity
-        entities[name] = 
-          position:
-            x: p.x + v.x * extrap
-            y: p.y + v.y * extrap
-      entities
+    entities = {}
+    extrap = time - snap.time
+    for name, player of snap.players
+      p = player.position
+      v = player.velocity
+      entities[name] =
+        position:
+          x: p.x + v.x * extrap
+          y: p.y + v.y * extrap
+    entities
 
   predict: (snap, commands) ->
     if snap.players[@localPlayer.name]
