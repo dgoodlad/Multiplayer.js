@@ -75,8 +75,10 @@ class Client
 
   predict: (snap, commands) ->
     if snap.players[@localPlayer.name]
-      @localPlayer.position = snap.players[@localPlayer.name].position
-      @localPlayer.velocity = snap.players[@localPlayer.name].velocity
+      @localPlayer.position.x = snap.players[@localPlayer.name].position.x
+      @localPlayer.position.y = snap.players[@localPlayer.name].position.y
+      @localPlayer.velocity.x = snap.players[@localPlayer.name].velocity.x
+      @localPlayer.velocity.y = snap.players[@localPlayer.name].velocity.y
       t = lastAckTime = snap.players[@localPlayer.name].time
       for command in commands
         if command.time > lastAckTime
