@@ -34,7 +34,7 @@ class Client
       @userCommands = @userCommands.filter (command) -> command.time > lastAckTime
 
   renderFrame: (time, input = {}) ->
-    if time >= @nextSnap.time
+    if time >= @nextSnap?.time
       @oldSnap = @nextSnap
       @nextSnap = null
     if time == @oldSnap.time
