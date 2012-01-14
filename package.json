@@ -1,20 +1,25 @@
 {
-  "author": "David Goodlad <david@goodlad.net> (http://d.goodlad.net/)",
-  "name": "network-game-hacks",
-  "description": "Node.js network gaming experiment",
-  "version": "0.0.1",
+  "name": "multiplayer",
+  "version": "0.1",
+  "description": "Generic-ish multiplayer support for nodejs and browsers",
   "repository": {
-    "url": ""
+    "type": "git",
+    "url": "http://github.com/dgoodlad/node-multiplayer.git"
   },
-  "engines": {
-    "node": "~0.4.12"
+  "author": {
+    "name": "David Goodlad",
+    "email": "david@goodlad.net",
+    "url": "http://d.goodlad.net/"
   },
+  "main": "./main.js"
   "dependencies": {
     "express": "~2.5.1",
     "socket.io": "~0.8.7",
-    "coffee-script": "~1.0"
+    "coffee-script": "~1.0",
+    "browserify": "~1.8.3"
   },
   "devDependencies": {
     "jasmine-node": "~1.0.13"
-  }
+  },
+  "engine": { "node": "~0.4.12" },
 }
