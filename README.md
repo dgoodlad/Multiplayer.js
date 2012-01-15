@@ -33,8 +33,9 @@ and the server acknowledging that input.
 npm install multiplayer
 ```
 
-There will be a downloadable browser-only package soon, but for now use the
-npm package to build the client-side js.
+There will be a downloadable browser-only package soon, but for now the easiest
+way to include `multiplayer.js` in your browser code is to use `browserify`.
+Check the example out for more info.
 
 ## How does it work?
 
