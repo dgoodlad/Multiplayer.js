@@ -4,9 +4,7 @@
     <meta name="charset" value="utf-8">
 
     <script src="/coffee-script.js"></script>
-    <script src="/client.js"></script>
-    <script src="/server.js"></script>
-    <script src="/player.js"></script>
+    <script src="/multiplayer.js"></script>
 
     <style type="text/css">
       .scene {
@@ -58,6 +56,10 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/coffeescript">
+      Client = require('/client')
+      Server = require('/server')
+      Player = require('/player')
+
       renderPlayer = (player, element) ->
         element.style['left'] = "#{player.position.x}px"
         element.style['top'] = "#{player.position.y}px"

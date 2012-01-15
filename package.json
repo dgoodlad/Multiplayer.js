@@ -12,6 +12,7 @@
     "url": "http://d.goodlad.net/"
   },
   "main": "./main.js"
+  "browserify": "./lib/main.coffee"
   "dependencies": {
     "express": "~2.5.1",
     "socket.io": "~0.8.7",
