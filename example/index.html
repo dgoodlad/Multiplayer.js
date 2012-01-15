@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="charset" value="utf-8">
+
+    <script src="/browserify.js"></script>
+
+    <style type="text/css">
+      .scene {
+        width: 300px;
+        height: 300px;
+        border: 1px solid silver;
+        margin: 10px;
+        position: relative;
+        float: left;
+      }
+
+      .player {
+        position: absolute;
+        height: 10px;
+        width: 10px;
+        overflow: hidden;
+      }
+
+      .player[data-player="john"] {
+        background-color: red;
+        color: red;
+      }
+
+      .player[data-player="jane"] {
+        background-color: blue;
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="john-scene" class="scene">
+      <h1>John's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <div id="jane-scene" class="scene">
+      <h1>Jane's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <div id="server-scene" class="scene">
+      <h1>Server's view</h1>
+      <div class="player" data-player="john">John</div>
+      <div class="player" data-player="jane">Jane</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/coffeescript">
+    </script>
+  </body>
+</html>

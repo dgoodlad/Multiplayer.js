@@ -1,6 +1,6 @@
 {
   "name": "multiplayer",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "Generic-ish multiplayer support for nodejs and browsers",
   "repository": {
     "type": "git",
@@ -11,8 +11,8 @@
     "email": "david@goodlad.net",
     "url": "http://d.goodlad.net/"
   },
-  "main": "./main.js"
-  "browserify": "./lib/main.coffee"
+  "main": "./src/main.coffee",
+  "browserify": "./src/main.coffee",
   "dependencies": {
     "express": "~2.5.1",
     "socket.io": "~0.8.7",
@@ -22,5 +22,5 @@
   "devDependencies": {
     "jasmine-node": "~1.0.13"
   },
-  "engine": { "node": "~0.4.12" },
+  "engine": { "node": "~0.4.12" }
 }

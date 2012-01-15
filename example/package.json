@@ -1,0 +1,13 @@
+{
+  "name": "multiplayer-example",
+  "version": "0.1.0",
+  "main": "./example.coffee",
+  "dependencies": {
+    "express": "~2.5.1",
+    "socket.io": "~0.8.7",
+    "coffee-script": "~1.0",
+    "browserify": "~1.8.3",
+    "multiplayer": "~0.1.0"
+  },
+  "engine": { "node": "~0.4.12" }
+}
