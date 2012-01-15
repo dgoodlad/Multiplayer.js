@@ -5,6 +5,7 @@ A framework for multiplayer physics simulations (read: games)
 ## Changelog
 
 Version 0.1 - First release, pretty mediocre API but it works.
+Version 0.1.1 - Remove a bunch of extraneous dependencies
 
 ## Description
 
