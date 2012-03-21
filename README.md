@@ -34,9 +34,23 @@ and the server acknowledging that input.
 npm install multiplayer
 ```
 
-There will be a downloadable browser-only package soon, but for now the easiest
-way to include `multiplayer.js` in your browser code is to use `browserify`.
-Check the example out for more info.
+The suggested method to wrap up this library for use in the browser is to use
+`browserify`. If you include this library as an npm dependency, you could do
+something like the following:
+
+```
+var express = require('express');
+var browserify = require('browserify');
+
+var app = express.createServer();
+app.listen(8080);
+
+var bundle = browserify({
+  mount: '/multiplayer.js',
+  require: ['multiplayer']
+});
+app.use(bundle);
+```
 
 ## How does it work?
 
